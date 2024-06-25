@@ -3,11 +3,14 @@ import colors from 'colors';
 import morgan from 'morgan';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import routes from './routes/route.js';
 
 dotenv.config();
 
 const PORT = process.env.PORT || 8000;
 const app = express();
+
+app.use('/api/v1', routes);
 
 app.use(morgan('dev'));
 app.use(express.json());
