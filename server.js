@@ -4,8 +4,11 @@ import morgan from 'morgan';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import routes from './routes/route.js';
+import connectDB from './config/dbConnect.js';
 
 dotenv.config();
+
+connectDB();
 
 const PORT = process.env.PORT || 8000;
 const app = express();
