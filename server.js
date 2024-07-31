@@ -4,7 +4,6 @@ import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/dbConnect.js";
 import router from "./user/userRoute.js";
-import colors from "colors";
 import errorHandler from "./middleware/errorHandler.js";
 
 dotenv.config();
@@ -27,5 +26,5 @@ app.get("/", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`E-Commerce app listening on ${PORT}`.bgCyan.bgMagenta);
+  console.log(`E-Commerce app listening on ${PORT}`);
 });
