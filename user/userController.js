@@ -69,3 +69,18 @@ export const login = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getUserProfile = async (req, res, next) => {
+  try {
+    const user = await UserModel.findById(req.user._id);
+
+    return res.status(200).json({
+      success: true,
+      message: "User Profile Fetch Successuly",
+      user,
+    });
+  } catch (error) {
+    console.error("Error in getting user profile", error);
+    next(error);
+  }
+};
