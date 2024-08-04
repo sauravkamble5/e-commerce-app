@@ -1,17 +1,23 @@
 import createHttpError from "http-errors";
 import UserModel from "./userModel.js";
 
-export const register = async (req, res) => {
+export const register = async (req, res, next) => {
   try {
-    const { name, email, password, city, address, country } = req.body;
-    if (!name || !email || !password || !city || !address || !country) {
-      const error = createHttpError(400, "All fields are required");
-      return next(error);
+    const { name, email, password, city, address, country, phone } = req.body;
+    if (
+      !name ||
+      !email ||
+      !password ||
+      !city ||
+      !address ||
+      !country ||
+      !phone
+    ) {
+      throw createHttpError(400, "All fields are required");
     }
     const existingUser = await UserModel.findOne({ email });
     if (existingUser) {
-      const error = createHttpError(400, "User already exists ");
-      return next(error);
+      throw createHttpError(400, "User already exists ");
     }
     const user = await UserModel.create({
       name,
@@ -20,6 +26,7 @@ export const register = async (req, res) => {
       city,
       address,
       country,
+      phone,
     });
     res.status(201).send({
       success: true,
@@ -28,34 +35,37 @@ export const register = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in registering user", error);
-    return next(createHttpError(500, "Error in registering user"));
+    next(error);
   }
 };
-export const login = async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    const error = createHttpError(400, "Email or Password are required");
-    return next(error);
-  }
-  let user;
-
+export const login = async (req, res, next) => {
   try {
-    user = await UserModel.findOne({ email });
-    if (!user) {
-      return next(createHttpError(404, "User not found"));
+    const { email, password } = req.body;
+    if (!email || !password) {
+      throw createHttpError(400, "Email or Password are required");
     }
-  } catch (error) {
-    return next(createHttpError(500, 'Error while getting user'))
-  }
 
-  //Comapre password
-  try{
-    const isMatch = await UserModel.comparePassword(password, user.password)
-    if(!isMatch){
-      return next(createHttpError(401, 'invalid credentials'))
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      throw createHttpError(404, "User not found");
     }
-  }catch(error){
-    return next(500, 'Error while comparing password')
+
+    //Comapre password
+    const isMatch = await user.comparePassword(password, user.password);
+    if (!isMatch) {
+      throw createHttpError(401, "Invalid credentials");
+    }
+
+    //token
+    const token = await user.generateToken();
+    return res.status(200).json({
+      success: true,
+      message: "Login Successful",
+      token,
+      user,
+    });
+  } catch (error) {
+    console.error("Error in logging user", error);
+    next(error);
   }
-  
 };
