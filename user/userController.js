@@ -1,5 +1,6 @@
 import createHttpError from "http-errors";
 import UserModel from "./userModel.js";
+import createError from "http-errors";
 
 export const register = async (req, res, next) => {
   try {
@@ -56,14 +57,21 @@ export const login = async (req, res, next) => {
       throw createHttpError(401, "Invalid credentials");
     }
 
-    //token
+    // Generate token
     const token = await user.generateToken();
-    return res.status(200).json({
-      success: true,
-      message: "Login Successful",
-      token,
-      user,
-    });
+    res
+      .status(200)
+      .cookie("token", token, {
+        httpOnly: process.env.NODE_ENV === "development" ? true : false,
+        secure: process.env.NODE_ENV === "development" ? true : false,
+        maxAge: 3600000,
+      })
+      .send({
+        success: true,
+        message: "Login Successful",
+        token,
+        user,
+      });
   } catch (error) {
     console.error("Error in logging user", error);
     next(error);
@@ -74,13 +82,29 @@ export const getUserProfile = async (req, res, next) => {
   try {
     const user = await UserModel.findById(req.user._id);
 
-    return res.status(200).json({
+    res.status(200).send({
       success: true,
       message: "User Profile Fetch Successuly",
       user,
     });
   } catch (error) {
     console.error("Error in getting user profile", error);
+    next(error);
+  }
+};
+
+export const logoutUser = (req, res, next) => {
+  try {
+    res.status(200).cookie("token", "", {
+      httpOnly: process.env.NODE_ENV === "development" ? true : false,
+      secure: process.env.NODE_ENV === "development" ? true : false,
+      maxAge: 3600000,
+    })
+    .send({
+      status:true,
+      message:"Logout Successfuly"
+    })
+  } catch (error) {
     next(error);
   }
 };
