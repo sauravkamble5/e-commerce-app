@@ -95,16 +95,77 @@ export const getUserProfile = async (req, res, next) => {
 
 export const logoutUser = (req, res, next) => {
   try {
-    res.status(200).cookie("token", "", {
-      httpOnly: process.env.NODE_ENV === "development" ? true : false,
-      secure: process.env.NODE_ENV === "development" ? true : false,
-      maxAge: 3600000,
-    })
-    .send({
-      status:true,
-      message:"Logout Successfuly"
-    })
+    res
+      .status(200)
+      .cookie("token", "", {
+        httpOnly: process.env.NODE_ENV === "development" ? true : false,
+        secure: process.env.NODE_ENV === "development" ? true : false,
+        maxAge: 3600000,
+      })
+      .send({
+        status: true,
+        message: "Logout Successfuly",
+      });
   } catch (error) {
+    console.error("Error in logging out user", error);
+    next(error);
+  }
+};
+
+export const updateUser = async (req, res, next) => {
+  try {
+    const user = await UserModel.findById(req.user._id);
+    if (!user) {
+      throw createHttpError(404, "User not found");
+    }
+    const { name, email, address, city, country, phone } = req.body;
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (address) user.address = address;
+    if (city) user.city = city;
+    if (country) user.country = country;
+    if (phone) user.phone = phone;
+
+    await user.save();
+    res.status(200).send({
+      success: true,
+      message: "User Updated",
+      user,
+    });
+  } catch (error) {
+    console.error("Error in updating user", error);
+    next(error);
+  }
+};
+
+export const updatePassword = async (req, res, next) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+
+    if (!oldPassword || !newPassword) {
+      throw createHttpError(400, "Old and New Password are required");
+    }
+    const user = await UserModel.findById(req.user._id);
+    if (!user) {
+      throw createHttpError(404, "User not found");
+    }
+    const isMatch = await user.comparePassword(oldPassword, user.password);
+    if (!isMatch) {
+      throw createHttpError(401, "Invalid old password");
+    }
+
+
+    user.password = newPassword;
+    await user.save();
+
+    res.status(200).send({
+      success: true,
+      message: "Password Updated",
+      user,
+    });
+
+  } catch (error) {
+    console.error("Error in updating password", error);
     next(error);
   }
 };
