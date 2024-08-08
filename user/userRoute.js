@@ -1,4 +1,6 @@
 import express from "express";
+const router = express.Router();
+
 import {
   getUserProfile,
   login,
@@ -11,7 +13,6 @@ import {
 import { isAuth } from "../middleware/authMiddleware.js";
 import singleUpload from "../middleware/multer.js";
 
-const router = express.Router();
 
 router.post("/register", register);
 router.post("/login", login);
