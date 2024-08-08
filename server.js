@@ -6,10 +6,16 @@ import connectDB from "./config/dbConnect.js";
 import router from "./user/userRoute.js";
 import errorHandler from "./middleware/errorHandler.js";
 import cookieParser from "cookie-parser";
+import cloudinary from "cloudinary";
 
 dotenv.config();
 
 connectDB();
+cloudinary.v2.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+ api_secret: process.env.CLOUDINARY_SECRET,
+});
 
 const PORT = process.env.PORT || 8000;
 const app = express();
@@ -34,5 +40,7 @@ app.get("/", (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`E-Commerce app listening on ${PORT} on ${process.env.NODE_ENV} Mode`);
+  console.log(
+    `E-Commerce app listening on ${PORT} on ${process.env.NODE_ENV} Mode`
+  );
 });

@@ -1,6 +1,7 @@
 import createHttpError from "http-errors";
 import UserModel from "./userModel.js";
-import createError from "http-errors";
+import { getDataUri } from "../utils/features.js";
+import cloudinary from "cloudinary";
 
 export const register = async (req, res, next) => {
   try {
@@ -154,7 +155,6 @@ export const updatePassword = async (req, res, next) => {
       throw createHttpError(401, "Invalid old password");
     }
 
-
     user.password = newPassword;
     await user.save();
 
@@ -163,9 +163,36 @@ export const updatePassword = async (req, res, next) => {
       message: "Password Updated",
       user,
     });
-
   } catch (error) {
     console.error("Error in updating password", error);
+    next(error);
+  }
+};
+
+export const updatePicture = async (req, res, next) => {
+  try {
+    const user = await UserModel.findById(req.user._id);
+    //file get from client photo
+    const file = getDataUri(req.file);
+
+    //delete previous image
+    await cloudinary.v2.uploader.destroy(user.profilePic.public_id);
+
+    //update
+    const cdb = await cloudinary.v2.uploader.upload(file.content);
+    user.profilePic = {
+      public_id: cdb.public_id,
+      url: cdb.secure_url,
+    };
+
+    await user.save();
+    res.status(200).send({
+      status: true,
+      message: "Profile pic updated successfuly",
+      user
+    });
+  } catch (error) {
+    console.error("Error in updating picture", error);
     next(error);
   }
 };
