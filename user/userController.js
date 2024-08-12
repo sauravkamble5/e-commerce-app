@@ -2,6 +2,7 @@ import createHttpError from "http-errors";
 import UserModel from "./userModel.js";
 import { getDataUri } from "../utils/features.js";
 import cloudinary from "cloudinary";
+import createError from "http-errors";
 
 export const register = async (req, res, next) => {
   try {
@@ -15,11 +16,11 @@ export const register = async (req, res, next) => {
       !country ||
       !phone
     ) {
-      throw createHttpError(400, "All fields are required");
+      return next(createError(400, "All fields are required"));
     }
     const existingUser = await UserModel.findOne({ email });
     if (existingUser) {
-      throw createHttpError(400, "User already exists ");
+      return next(createError(400, "User already exists "));
     }
     const user = await UserModel.create({
       name,
@@ -44,18 +45,18 @@ export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
-      throw createHttpError(400, "Email or Password are required");
+      return next(createError(400, "Email or Password are required"));
     }
 
     const user = await UserModel.findOne({ email });
     if (!user) {
-      throw createHttpError(404, "User not found");
+      return next(createError(404, "User not found"));
     }
 
     //Comapre password
     const isMatch = await user.comparePassword(password, user.password);
     if (!isMatch) {
-      throw createHttpError(401, "Invalid credentials");
+      return next(createError(401, "Invalid credentials"));
     }
 
     // Generate token
@@ -117,7 +118,7 @@ export const updateUser = async (req, res, next) => {
   try {
     const user = await UserModel.findById(req.user._id);
     if (!user) {
-      throw createHttpError(404, "User not found");
+      return next(createError(404, "User not found"));
     }
     const { name, email, address, city, country, phone } = req.body;
     if (name) user.name = name;
@@ -144,15 +145,15 @@ export const updatePassword = async (req, res, next) => {
     const { oldPassword, newPassword } = req.body;
 
     if (!oldPassword || !newPassword) {
-      throw createHttpError(400, "Old and New Password are required");
+      return next(createError(400, "Old and New Password are required"));
     }
     const user = await UserModel.findById(req.user._id);
     if (!user) {
-      throw createHttpError(404, "User not found");
+      return next(createError(404, "User not found"));
     }
     const isMatch = await user.comparePassword(oldPassword, user.password);
     if (!isMatch) {
-      throw createHttpError(401, "Invalid old password");
+      return next(createError(401, "Invalid old password"));
     }
 
     user.password = newPassword;
@@ -189,7 +190,7 @@ export const updatePicture = async (req, res, next) => {
     res.status(200).send({
       status: true,
       message: "Profile pic updated successfuly",
-      user
+      user,
     });
   } catch (error) {
     console.error("Error in updating picture", error);
