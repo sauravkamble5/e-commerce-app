@@ -22,10 +22,12 @@ const ProductSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
     },
-    images: {
-      public_id: String,
-      url: String,
-    },
+    images: [
+      {
+        public_id: String,
+        url: String,
+      },
+    ],
   },
   { timestamps: true }
 );
