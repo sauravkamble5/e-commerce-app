@@ -45,14 +45,14 @@ export const getSingleProduct = async (req, res, next) => {
   }
 };
 
-export const createProduct = async (req, res,next) => {
+export const createProduct = async (req, res, next) => {
   try {
     const { name, description, price, stock, category } = req.body;
     // if (!name || !description || !price || !stock || !category) {
     //   return next(createError(400, "Please provide all fields"));
     // }
 
-   if (!req.file) {
+    if (!req.file) {
       return next(createError(400, "Please provide product images"));
     }
 
@@ -62,7 +62,7 @@ export const createProduct = async (req, res,next) => {
       public_id: cdb.public_id,
       url: cdb.secure_url,
     };
- 
+
     const product = await ProductModel.create({
       name,
       description,
@@ -81,5 +81,74 @@ export const createProduct = async (req, res,next) => {
     console.error("Error creating product");
     console.error(error.stack);
     next(createError(500, "Internal server error"));
+  }
+};
+
+export const updateProduct = async (req, res, next) => {
+  try {
+    const productId = req.params.id;
+    if (!productId) {
+      return next(createError(400, "Product Id is required"));
+    }
+    const product = await ProductModel.findById(productId);
+    if (!product) {
+      return next(createError(404, "product not found"));
+    }
+    const { name, description, price, stock, category } = req.body;
+    if (name) product.name = name;
+    if (description) product.description = description;
+    if (price) product.price = price;
+    if (stock) product.stock = stock;
+    if (category) product.category = category;
+
+    await product.save();
+    res.status(200).send({
+      status: true,
+      message: "Product updated successfully",
+      data: product,
+    });
+  } catch (error) {
+    console.error("Error updating product", error);
+    console.error(error.stack);
+    next(createError(500, "Internal server error"));
+  }
+};
+
+export const updateImage = async (req, res, next) => {
+  try {
+    const productId = req.params.id;
+    if (!productId) {
+      return next(createError(400, "Product Id is required"));
+    }
+
+    const product = await ProductModel.findById(productId);
+    if (!product) {
+      return next(createError(404, "Product not found"));
+    }
+
+    if (!req.file) {
+      return next(createError(404, "Product Image not found"));
+    }
+
+    const file = getDataUri(req.file);
+    const cdb = await cloudinary.v2.uploader.upload(file.content);
+    const image = {
+      public_id: cdb.public_id,
+      url: cdb.secure_url,
+    };
+    product.images.push(image);
+    await product.save();
+
+    res.status(200).send({
+      status: true,
+      message: "Image updated successfully",
+      data:{
+        imageUrl:image.url
+      }
+    });
+  } catch (error) {
+    console.error("Internal server error", error);
+    console.error(error.stack);
+    next(createError(500, "Error updating image"));
   }
 };

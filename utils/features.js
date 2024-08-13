@@ -6,4 +6,3 @@ export const getDataUri = (file) => {
   const extName = path.extname(file.originalname).toString(); // Use path.extname
   return parser.format(extName, file.buffer);
 };
-
