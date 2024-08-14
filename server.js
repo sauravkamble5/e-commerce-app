@@ -8,6 +8,7 @@ import errorHandler from "./middleware/errorHandler.js";
 import cookieParser from "cookie-parser";
 import cloudinary from "cloudinary";
 import productRouter from "./product/productRoute.js";
+import categoryRouter from "./category/categoryRoute.js";
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ app.use(cookieParser());
 // Routes
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/product", productRouter);
+app.use("/api/v1/category", categoryRouter);
 
 // Error handling middleware
 app.use(errorHandler);

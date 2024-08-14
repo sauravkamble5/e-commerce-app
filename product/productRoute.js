@@ -1,4 +1,5 @@
 import express from "express";
+const router = express.Router();
 import {
   createProduct,
   deleteProduct,
@@ -11,7 +12,6 @@ import {
 import { isAuth } from "../middleware/authMiddleware.js";
 import singleUpload from "../middleware/multer.js";
 
-const router = express.Router();
 
 //GET ALL PRODUCTS
 router.get("/getAllProducts", getAllProducts);
