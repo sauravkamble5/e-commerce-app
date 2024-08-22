@@ -67,6 +67,6 @@ UserSchema.methods.generateToken = function () {
   });
 };
 
-const UserModel = mongoose.models.User || mongoose.model("User", UserSchema);
+const UserModel = mongoose.models.User || mongoose.model("Users", UserSchema);
 
 export default UserModel;

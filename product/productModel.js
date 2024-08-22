@@ -18,6 +18,10 @@ const ProductSchema = new mongoose.Schema(
       type: Number,
       required: [true, "Product stock is required"],
     },
+    // qunatity: {
+    //   type: Number,
+    //   required: [true, "Product Quantity is required"],
+    // },
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
@@ -33,5 +37,5 @@ const ProductSchema = new mongoose.Schema(
 );
 
 const ProductModel =
-  mongoose.models.Product || mongoose.model("Product", ProductSchema);
+  mongoose.models.Product || mongoose.model("Products", ProductSchema);
 export default ProductModel;

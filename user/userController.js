@@ -1,4 +1,3 @@
-import createHttpError from "http-errors";
 import UserModel from "./userModel.js";
 import { getDataUri } from "../utils/features.js";
 import cloudinary from "cloudinary";
