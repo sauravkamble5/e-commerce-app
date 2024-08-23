@@ -5,7 +5,8 @@ import createError from "http-errors";
 
 export const register = async (req, res, next) => {
   try {
-    const { name, email, password, city, address, country, phone } = req.body;
+    const { name, email, password, city, address, country, phone, answer } =
+      req.body;
     if (
       !name ||
       !email ||
@@ -13,7 +14,8 @@ export const register = async (req, res, next) => {
       !city ||
       !address ||
       !country ||
-      !phone
+      !phone ||
+      !answer
     ) {
       return next(createError(400, "All fields are required"));
     }
@@ -29,6 +31,7 @@ export const register = async (req, res, next) => {
       address,
       country,
       phone,
+      answer,
     });
     res.status(201).send({
       success: true,
@@ -194,5 +197,31 @@ export const updatePicture = async (req, res, next) => {
   } catch (error) {
     console.error("Error in updating picture", error);
     next(error);
+  }
+};
+
+export const resetPassword = async (req, res, next) => {
+  try {
+    const { email, newPassword, answer } = req.body;
+    if (!email || !newPassword || !answer) {
+      return next(createError(400, "Please fill all fields"));
+    }
+
+    const user = await UserModel.findOne({ email, answer });
+    if (!user) {
+      return next(createError(404, "Invalid user or answer"));
+    }
+
+    user.password = newPassword;
+
+    await user.save();
+
+    res.status(200).send({
+      status: true,
+      message: "Password reset successfuly",
+    });
+  } catch (error) {
+    console.error("Error in resetting password", error.stack || error.message);
+    console.error(500, "Internal server error");
   }
 };
