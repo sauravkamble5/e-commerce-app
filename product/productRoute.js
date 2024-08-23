@@ -9,7 +9,7 @@ import {
   updateImage,
   updateProduct,
 } from "./productController.js";
-import { isAuth } from "../middleware/authMiddleware.js";
+import { isAdmin, isAuth } from "../middleware/authMiddleware.js";
 import singleUpload from "../middleware/multer.js";
 
 
@@ -20,17 +20,18 @@ router.get("/getAllProducts", getAllProducts);
 router.get("/:id", getSingleProduct);
 
 //CREATE PRODUCT
-router.post("/createProduct", isAuth, singleUpload, createProduct);
+router.post("/createProduct", isAuth, isAdmin, singleUpload, createProduct);
 
 //UPDATE PRODUCT
-router.put("/:id", isAuth, updateProduct);
+router.put("/:id", isAuth, isAdmin, updateProduct);
 
 //UPDATE IMAGE
-router.put("/image/:id", isAuth, singleUpload, updateImage);
+router.put("/image/:id", isAuth, isAdmin, singleUpload, updateImage);
 
 //DELETE IMAGE
-router.delete("/:productId/image/:imageId", isAuth, deleteProductImage);
+router.delete("/:productId/image/:imageId", isAuth, isAdmin, deleteProductImage);
 
-router.delete("/deleteProduct/:productId", isAuth, deleteProduct);
+//DELETE
+router.delete("/deleteProduct/:productId", isAuth, isAdmin, deleteProduct);
 
 export default router;

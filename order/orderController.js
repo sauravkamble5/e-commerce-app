@@ -27,7 +27,7 @@ export const createOrder = async (req, res, next) => {
     //   !totalAmount ||
     //   !orderStatus
     // ) {
-    //   console.log(req.body)
+    //   console.log(req.body);
     //   return next(createError(400, "All fields are required"));
     // }
 
@@ -42,7 +42,6 @@ export const createOrder = async (req, res, next) => {
       shippingCharges,
       totalAmount,
     });
-    console.log(order);
 
     //Stock update
     for (let i = 0; i < orderItems.length; i++) {
@@ -119,5 +118,49 @@ export const payment = async (req, res, next) => {
   } catch (error) {
     console.error("", error.stack || error.message);
     console.error("Internal Server Error");
+  }
+};
+
+export const adminGetAllOrders = async (req, res, next) => {
+  try {
+    const orders = await OrderModel.find({});
+
+    res.status(200).send({
+      success: true,
+      message: "All orders data",
+      totalOrders: orders.length,
+      orders,
+    });
+  } catch (error) {
+    console.error();
+    console.error(500, "Internal server error");
+  }
+};
+
+export const updateOrderStatus = async (req, res, next) => {
+  try {
+    const order = await OrderModel.findById(req.params.id);
+    if (!order) {
+      return next(createError(404, "Order not found"));
+    }
+    if (order.orderStatus === "Processing") order.orderStatus = "Shipped";
+    else if (order.orderStatus === "Shipped") {
+      order.orderStatus = "Delivered";
+      order.deliveredAt = Date.now();
+    } else {
+      return next(
+        createError(500, "Order already delivered or invalid status")
+      );
+    }
+
+    await order.save();
+
+    res.status(200).send({
+      status: true,
+      message: "order status updated",
+    });
+  } catch (error) {
+    console.error("Error updating order status:", error.stack || error.message);
+    console.error(500, "Internal server error");
   }
 };

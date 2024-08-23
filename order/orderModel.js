@@ -95,5 +95,3 @@ const orderSchema = new mongoose.Schema(
 const OrderModel =
   mongoose.models.Orders || mongoose.model("Orders", orderSchema);
 export default OrderModel;
-
-
