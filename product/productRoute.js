@@ -6,6 +6,7 @@ import {
   deleteProductImage,
   getAllProducts,
   getSingleProduct,
+  productReview,
   updateImage,
   updateProduct,
 } from "./productController.js";
@@ -33,5 +34,7 @@ router.delete("/:productId/image/:imageId", isAuth, isAdmin, deleteProductImage)
 
 //DELETE
 router.delete("/deleteProduct/:productId", isAuth, isAdmin, deleteProduct);
+
+router.put('/:id/review', isAuth, productReview)
 
 export default router;

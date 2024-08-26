@@ -1,5 +1,19 @@
 import mongoose from "mongoose";
 
+const ReviewSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: [true, "Name is required"] },
+    rating: { type: Number, default: 0 },
+    comment: { type: String },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Users",
+      required: [true, "User required"],
+    },
+  },
+  { timestamps: true }
+);
+
 const ProductSchema = new mongoose.Schema(
   {
     name: {
@@ -18,24 +32,29 @@ const ProductSchema = new mongoose.Schema(
       type: Number,
       required: [true, "Product stock is required"],
     },
-    // qunatity: {
-    //   type: Number,
-    //   required: [true, "Product Quantity is required"],
-    // },
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
     },
     images: [
       {
-        public_id: String,
-        url: String,
+        public_id: { type: String, required: true },
+        url: { type: String, required: true },
       },
     ],
+    reviews: [ReviewSchema],
+    rating: {
+      type: Number,
+      default: 0,
+    },
+    numReviews: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );
 
 const ProductModel =
-  mongoose.models.Product || mongoose.model("Products", ProductSchema);
+  mongoose.models.Product || mongoose.model("Product", ProductSchema); // Use singular "Product"
 export default ProductModel;

@@ -177,7 +177,7 @@ export const deleteProductImage = async (req, res, next) => {
   }
 };
 
-export const deleteProduct = async (req, res,next) => {
+export const deleteProduct = async (req, res, next) => {
   try {
     const productId = req.params.productId;
     if (!productId) {
@@ -200,8 +200,53 @@ export const deleteProduct = async (req, res,next) => {
       message: "Product deleted successfully",
     });
   } catch (error) {
-    console.error("Internal server error");
-    console.error(error.stack);
+    console.error("Internal server error", error.stack || error.message);
     next(createError(500, "Error deleting product"));
+  }
+};
+
+export const productReview = async (req, res, next) => {
+  try {
+    const { rating, comment } = req.body;
+    const product = await ProductModel.findById(req.params.id);
+
+    if (!product) {
+      return next(createError(404, "Product not found"));
+    }
+    console.log(
+      "USERID: ",
+      product.reviews.find((review) => review)
+    );
+
+    const alreadyReviewed = product.reviews.find(
+      (review) => review.userId.toString() === req.user._id.toString()
+    );
+    if (alreadyReviewed) {
+      return next(createError(400, "You have already reviewed this product"));
+    }
+    const review = {
+      name: req.user.name,
+      rating: Number(rating),
+      comment,
+      userId: req.user._id,
+    };
+
+    product.reviews.push(review);
+
+    product.numReviews = product.reviews.length;
+
+    product.rating =
+      product.reviews.reduce((acc, review) => acc + review.rating, 0) /
+      product.reviews.length; // calculate average rating
+
+    await product.save();
+    res.status(201).send({
+      status: true,
+      message: "Review added successfully",
+      review,
+    });
+  } catch (error) {
+    console.error("Error adding product review:", error.stack || error.message);
+    next(createError(500, "Internal server error"));
   }
 };
