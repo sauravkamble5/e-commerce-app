@@ -1,4 +1,6 @@
 import express from "express";
+import helmet from "helmet";
+import ExpressMongoSanitize from "express-mongo-sanitize";
 import morgan from "morgan";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -24,6 +26,8 @@ const PORT = process.env.PORT || 8000;
 const app = express();
 
 // Middleware
+app.use(helmet());
+app.use(ExpressMongoSanitize());
 app.use(morgan("dev"));
 app.use(express.json());
 
