@@ -6,6 +6,7 @@ import {
   deleteProductImage,
   getAllProducts,
   getSingleProduct,
+  getTopProduct,
   productReview,
   updateImage,
   updateProduct,
@@ -17,8 +18,11 @@ import singleUpload from "../middleware/multer.js";
 //GET ALL PRODUCTS
 router.get("/getAllProducts", getAllProducts);
 
+router.get('/getTopProduct', getTopProduct)
+
 //GET SINGLE PRODUCT
 router.get("/:id", getSingleProduct);
+
 
 //CREATE PRODUCT
 router.post("/createProduct", isAuth, isAdmin, singleUpload, createProduct);
@@ -36,5 +40,6 @@ router.delete("/:productId/image/:imageId", isAuth, isAdmin, deleteProductImage)
 router.delete("/deleteProduct/:productId", isAuth, isAdmin, deleteProduct);
 
 router.put('/:id/review', isAuth, productReview)
+
 
 export default router;

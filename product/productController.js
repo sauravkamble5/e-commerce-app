@@ -5,8 +5,15 @@ import { getDataUri } from "../utils/features.js";
 
 //GET ALL PRODUCTS
 export const getAllProducts = async (req, res, next) => {
+  const { keyword, category } = req.query;
   try {
-    const products = await ProductModel.find({});
+    const products = await ProductModel.find({
+      name: {
+        $regex: keyword ? keyword : "",
+        $options: "i",
+      },
+      category: category ? category : undefined,
+    }).populate("category");
 
     if (!products || products.length === 0) {
       return next(createError(404, " No products  found "));
@@ -15,6 +22,7 @@ export const getAllProducts = async (req, res, next) => {
     res.status(200).send({
       status: true,
       message: "All products fetched successfully",
+      totalProducts: products.length,
       data: products,
     });
   } catch (error) {
@@ -250,3 +258,17 @@ export const productReview = async (req, res, next) => {
     next(createError(500, "Internal server error"));
   }
 };
+
+export const getTopProduct = async (req, res, next) => {
+  try {
+    const products = await ProductModel.find({}).sort({rating:-1}).limit(3)
+     res.status(201).send({
+      status: true,
+      message: "Top products",
+      products,
+    });
+  } catch (error) {
+     console.error("Error sorting top products:", error.stack || error.message);
+    next(createError(500, "Internal server error"));
+  }
+}
