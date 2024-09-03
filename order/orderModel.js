@@ -38,7 +38,7 @@ const orderSchema = new mongoose.Schema(
         product: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Products",
-          required: true,
+          required: [true, "Product ID is required"],
         },
       },
     ],
@@ -73,7 +73,7 @@ const orderSchema = new mongoose.Schema(
     },
     shippingCharges: {
       type: Number,
-      required: [true, "Shipping charges is reqiured"],
+      required: [true, "Shipping charges is required"],
       default: 0.0,
     },
     totalAmount: {

@@ -14,13 +14,13 @@ import {
 import { isAuth } from "../middleware/authMiddleware.js";
 import singleUpload from "../middleware/multer.js";
 
-router.post("/register", register);
-router.post("/login", login);
-router.get("/getUserProfile", isAuth, getUserProfile);
-router.get("/logoutUser", isAuth, logoutUser);
-router.put("/updateUser", isAuth, updateUser);
-router.put("/updatePassword", isAuth, updatePassword);
-router.put("/updatePicture", isAuth, singleUpload, updatePicture);
-router.post("/resetPassword", resetPassword);
+router.post("/register", register); // Register a new user
+router.post("/login", login);       // User login
+router.get("/getUserProfile", isAuth, getUserProfile); // Fetch user profile
+router.get("/logoutUser", isAuth, logoutUser);         // User logout
+router.put("/updateUser", isAuth, updateUser);         // Update user details
+router.put("/updatePassword", isAuth, updatePassword); // Update password 
+router.put("/updatePicture", isAuth, singleUpload, updatePicture);  // Update profile picture
+router.post("/resetPassword", resetPassword); // Reset password
 
 export default router;
